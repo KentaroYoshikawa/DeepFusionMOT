@@ -2,6 +2,7 @@
 # Emial: 1393196999@qq.com
 
 import os
+from os.path import join
 
 
 def load_list_from_folder(detections_files, detections_root):
@@ -14,7 +15,7 @@ def load_list_from_folder(detections_files, detections_root):
     '''
     filelist = list()
     for detections_file in detections_files:
-        position = detections_root + "\\" + detections_file
+        position = join(detections_root, detections_file)
         filelist.append(position)
     num_efile = len(filelist)
     return filelist, num_efile

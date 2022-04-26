@@ -121,7 +121,7 @@ if __name__ == '__main__':
     calib_files = os.listdir(calib_root)
     detections_files_3D = os.listdir(detections_root_3D)
     detections_files_2D = os.listdir(detections_root_2D)
-    image_files = os.listdir(dataset_dir)
+    image_files = sorted(os.listdir(dataset_dir))
     detection_file_list_3D, num_seq_3D = load_list_from_folder(detections_files_3D, detections_root_3D)
     detection_file_list_2D, num_seq_2D = load_list_from_folder(detections_files_2D, detections_root_2D)
     image_file_list, _ = load_list_from_folder(image_files, dataset_dir)
@@ -135,13 +135,13 @@ if __name__ == '__main__':
         total_image = 0  # Record the total frames in this dataset
         seq_file_2D = detection_file_list_2D[i]
         seq_name, datasets_name, _ = fileparts(seq_file_3D)
-        txt_path = txt_path_0 + "\\" + image_filename + '.txt'
-        image_path = image_path_0 + '\\' + image_filename; mkdir_if_inexistence(image_path)
+        txt_path = join(txt_path_0, image_filename + '.txt')
+        image_path = join(image_path_0, image_filename); mkdir_if_inexistence(image_path)
 
         calib_file = [calib_file for calib_file in calib_files if calib_file==seq_name ]
         calib_file_seq = os.path.join(calib_root, ''.join(calib_file))
         image_dir = os.path.join(dataset_dir, image_filename)
-        image_filenames = [join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)]
+        image_filenames = sorted([join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)])
         seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
         seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
 
@@ -195,7 +195,7 @@ if __name__ == '__main__':
                                 bbox2d_tmp_trk[1],bbox2d_tmp_trk[2],bbox2d_tmp_trk[3],bbox3d_tmp[0], bbox3d_tmp[1],bbox3d_tmp[2], bbox3d_tmp[3],
                                 bbox3d_tmp[4], bbox3d_tmp[5],bbox3d_tmp[6],conf_tmp)
                         f.write(str_to_srite)
-                        # show_image_with_boxes(img_0, bbox3d_tmp, image_path, color, img0_name, label, calib_file_seq,line_thickness=1)
+                        show_image_with_boxes(img_0, bbox3d_tmp, image_path, color, img0_name, label, calib_file_seq, line_thickness=1)
         i += 1
         print('--------------The time it takes to process all datasets are {}s --------------'.format(total_time))
     print('--------------FPS = {} --------------'.format(total_frames/total_time))

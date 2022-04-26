@@ -2,6 +2,7 @@
 # Emial: 1393196999@qq.com
 
 import os, numpy as np, sys, cv2, glob
+from os.path import join
 import random
 import torch
 from pathlib import Path
@@ -23,7 +24,7 @@ def plot_one_box(x, im, image_path, color=None, img0_name=None, label=None, line
         c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
         cv2.rectangle(im, c1, c2, color, -1, cv2.LINE_AA)  # filled
         cv2.putText(im, str(label), (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
-    cv2.imwrite(image_path + "\\" + "{}.png".format(img0_name), im)
+    cv2.imwrite(join(image_path, "{}.png".format(img0_name)), im)
 
 
 def xywh2xyxy(x):
