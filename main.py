@@ -144,6 +144,7 @@ if __name__ == '__main__':
         image_filenames = sorted([join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)])
         seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
         seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=' ')[:6]  # load 2D detections, N x 6
+        #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
 
         min_frame, max_frame = int(seq_dets_3D[:, 0].min()), len(image_filenames)
 
