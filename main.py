@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # Define the file name
     data_root = 'datasets/kitti/train'
     detections_name_3D = '3D_pointrcnn_Car_val'
-    detections_name_2D = '2D_rrc_Car_val'
+    detections_name_2D = '2D_TrackRCNN/10fps'
 
     # Define the file path
     calib_root = os.path.join(data_root, 'calib_train')
@@ -143,7 +143,7 @@ if __name__ == '__main__':
         image_dir = os.path.join(dataset_dir, image_filename)
         image_filenames = sorted([join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)])
         seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
-        seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
+        seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=' ')[:6]  # load 2D detections, N x 6
 
         min_frame, max_frame = int(seq_dets_3D[:, 0].min()), len(image_filenames)
 
