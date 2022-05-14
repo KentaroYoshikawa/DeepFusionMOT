@@ -104,7 +104,8 @@ if __name__ == '__main__':
     # Define the file name
     data_root = 'datasets/kitti/train'
     detections_name_3D = '3D_pointrcnn_Car_val'
-    detections_name_2D = '2D_TrackRCNN/10fps'
+    detections_name_2D = '2D_rrc_Car_val'
+    #detections_name_2D = '2D_TrackRCNN/10fps'
 
     # Define the file path
     calib_root = os.path.join(data_root, 'calib_train')
@@ -143,8 +144,8 @@ if __name__ == '__main__':
         image_dir = os.path.join(dataset_dir, image_filename)
         image_filenames = sorted([join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)])
         seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
-        seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=' ')[:6]  # load 2D detections, N x 6
-        #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
+        #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=' ')[:6]  # load 2D detections, N x 6
+        seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
 
         min_frame, max_frame = int(seq_dets_3D[:, 0].min()), len(image_filenames)
 
@@ -182,7 +183,13 @@ if __name__ == '__main__':
             if len(trackers) > 0:
                 for d in trackers:
                     bbox3d = d.flatten()
-                    bbox3d_tmp = bbox3d[1:8]  # 3D bounding box(h,w,l,x,y,z,theta)
+                    #bbox3d(0 1.95 1.75 4.38 -4.65 1.85 13.6 -2.14 -1.81 2.0 295.6 166.5 452.0 291.1 9.13)
+                    #bbox3d(flame h w l x y z rot_y alpha type 2d_x1 2d_y1 2d_x2 2d_y2 score)
+ 
+                    #import ipdb
+                    #ipdb.set_trace()
+
+                    bbox3d_tmp = bbox3d[1:8]  # 3D bounding box(h,w,l,x,y,z,theta=rot_y)
                     id_tmp = int(bbox3d[0])
                     ori_tmp = bbox3d[8]
                     type_tmp = det_id2str[bbox3d[9]]
