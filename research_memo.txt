@@ -16,3 +16,8 @@ DFの結果をAB3DMOTの評価コードに落とせない
 ==>[2]の数値が原因か
 ==>trackIDであるのにframeになっている？
 
+5/18
+DFの結果をAB3DMOTの評価コードに落とせない
+==>trackIDであるのにframeになっている？
+=>str_to_sriteの中身は正しい
+

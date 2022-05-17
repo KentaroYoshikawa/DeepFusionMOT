@@ -1,0 +1,46 @@
+# set -g prefix C-a
+# bind a send-prefix
+
+set-option -g status-position top
+set-option -g status-justify centre
+bind | split-window -h
+bind - split-window -v
+set-option -g base-index 1
+bind r source-file ~/.tmux.conf \; display “Reloaded!“:
+set-option -g status-right “#[fg=black][%Y/%m/%d %H:%M:%S]”
+
+
+#set-option -g status-right “%m/%d %H:%M:%S”
+
+set -g status-interval 1
+set-option -g renumber-windows on
+setw -g monitor-activity on
+set -g visual-activity on
+set-option -g history-limit 100000
+
+
+# mouce-on-off
+
+set-option -g mouse on
+bind-key m if-shell “tmux show-options -g mouse | grep off” “set-option -g mouse on” “set-option -g mouse off”
+
+
+# yoshiki nagasaki
+
+set-option -g default-shell /bin/zsh
+set-option -g default-terminal screen-256color
+set -g terminal-overrides 'xterm:colors=256'
+set -g prefix C-t
+unbind C-b
+set-option -g status-position top
+set-option -g status-left-length 90
+set-option -g status-right-length 90
+set-option -g status-left '#H:[#P]'
+set-option -g status-right '#(wifi) #(battery --tmux) [%Y-%m-%d(%a) %H:%M]'
+set-option -g status-interval 1
+set-option -g status-justify centre
+set-option -g status-bg "colour238"
+set-option -g status-fg "colour255"
+bind | split-window -h
+bind - split-window -v
+bind-key -T copy-mode Enter send -X copy-pipe-no-clear "xsel --clipboard --input"

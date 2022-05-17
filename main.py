@@ -191,6 +191,10 @@ if __name__ == '__main__':
 
                     bbox3d_tmp = bbox3d[1:8]  # 3D bounding box(h,w,l,x,y,z,theta=rot_y)
                     id_tmp = int(bbox3d[0])
+
+                    #import ipdb
+                    #ipdb.set_trace()
+
                     ori_tmp = bbox3d[8]
                     type_tmp = det_id2str[bbox3d[9]]
                     bbox2d_tmp_trk = bbox3d[10:14]
@@ -199,7 +203,7 @@ if __name__ == '__main__':
                     label = f'{id_tmp} {"car"}'
                     image_save_path = os.path.join(image_path, '%06d.jpg' % (int(img0_name)))
                     with open(txt_path, 'a') as f:
-                        str_to_srite = '%d %d %s 0 0 %f %f %f %f %f %f %f %f %f %f %f %f %f\n' % (frame, id_tmp,type_tmp, ori_tmp,bbox2d_tmp_trk[0],
+                        str_to_srite = '%d %d %s 0 0 %f %f %f %f %f %f %f %f %f %f %f %f %f\n' % (frame, id_tmp, type_tmp, ori_tmp,bbox2d_tmp_trk[0],
                                 bbox2d_tmp_trk[1],bbox2d_tmp_trk[2],bbox2d_tmp_trk[3],bbox3d_tmp[0], bbox3d_tmp[1],bbox3d_tmp[2], bbox3d_tmp[3],
                                 bbox3d_tmp[4], bbox3d_tmp[5],bbox3d_tmp[6],conf_tmp)
                         f.write(str_to_srite)
