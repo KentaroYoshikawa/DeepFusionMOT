@@ -2,6 +2,7 @@
 # author: wangxy
 from __future__ import print_function
 import os, numpy as np, time, cv2, torch
+from glob import glob
 from os import listdir
 from os.path import join
 from file_operation.file import load_list_from_folder, mkdir_if_inexistence, fileparts
@@ -104,8 +105,8 @@ if __name__ == '__main__':
     # Define the file name
     data_root = 'datasets/kitti/train'
     detections_name_3D = '3D_pointrcnn_Car_val'
-    detections_name_2D = '2D_rrc_Car_val'
-    #detections_name_2D = '2D_TrackRCNN/10fps'
+    # detections_name_2D = '2D_rrc_Car_val'
+    detections_name_2D = '2D_TrackRCNN/10fps'
 
     # Define the file path
     calib_root = os.path.join(data_root, 'calib_train')
@@ -116,6 +117,9 @@ if __name__ == '__main__':
     # Define the file path of results.
     save_root = 'results/train'   # The root directory where the result is saved
     txt_path_0 = os.path.join(save_root, 'data'); mkdir_if_inexistence(txt_path_0)
+    txt_files = glob(os.path.join(txt_path_0, "*.txt"))
+    for txt_file in txt_files:
+        os.remove(txt_file)
     image_path_0 = os.path.join(save_root, 'image'); mkdir_if_inexistence(image_path_0)
     # Open file to save in list.
     det_id2str = {1: 'Pedestrian', 2: 'Car', 3: 'Cyclist'}
@@ -144,8 +148,11 @@ if __name__ == '__main__':
         image_dir = os.path.join(dataset_dir, image_filename)
         image_filenames = sorted([join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)])
         seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
-        #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=' ')[:6]  # load 2D detections, N x 6
-        seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
+        #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
+        with open(seq_file_2D) as f:
+            lines = f.readlines()
+            seq_dets_2D = [[float(x) for x in line.split(" ")[:6]] for line in lines]
+            seq_dets_2D = np.array(seq_dets_2D)
 
         min_frame, max_frame = int(seq_dets_3D[:, 0].min()), len(image_filenames)
 
