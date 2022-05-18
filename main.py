@@ -104,8 +104,9 @@ class DeepFusion(object):
 if __name__ == '__main__':
     # Define the file name
     data_root = 'datasets/kitti/train'
-    detections_name_3D = '3D_pointrcnn_Car_val'
-    # detections_name_2D = '2D_rrc_Car_val'
+    detections_name_3D = '3D_ab3dmot_car'
+    #detections_name_3D = '3D_pointrcnn/5fps'
+    #detections_name_2D = '2D_rrc_Car_val'
     detections_name_2D = '2D_TrackRCNN/10fps'
 
     # Define the file path

@@ -2,22 +2,36 @@
 5/14
 TrackRCNNを指定したが後ろのバグを除けていない
 DFの結果をAB3DMOTの評価コードに落とせない
-==>[2]の数値が原因か
-==>gitにはTrackEval利用指示
+ ==>[2]の数値が原因か
+ ==>gitにはTrackEval利用指示
 コマンドの履歴を検索する
-==>ctr+R
+ ==>ctr+R
 tmuxの分割方法わからず
 zsh+zplugをできるようにしたい
 
 5/15
 DFの結果をAB3DMOTの評価コードに落とせない
-==>resultの配列？？
-==>合ってる
-==>[2]の数値が原因か
-==>trackIDであるのにframeになっている？
+ ==>resultの配列？？
+ ==>合ってる
+ ==>[2]の数値が原因か
+ ==>trackIDであるのにframeになっている？
 
 5/18
 DFの結果をAB3DMOTの評価コードに落とせない
-==>trackIDであるのにframeになっている？
-=>str_to_sriteの中身は正しい
+ ==>trackIDであるのにframeになっている？
+ =>str_to_sriteの中身は正しい
+ ==>番号とデータを積み重ねていた
+
+result depends on 2D-input
+ab3dmot * trackrcnn
+pointrcnn * trackrcnn
+ MOTA  0.9103
+ sAMOTA  AMOTA  AMOTP 
+ 0.9564 0.4852 0.7902
+
+ab3dmot * rrc
+pointrcnn * rrc 
+ MOTA 0.8913
+ sAMOTA  AMOTA  AMOTP 
+ 0.9180 0.4462 0.7777
 
