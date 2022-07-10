@@ -49,6 +49,7 @@ def main(args):
     image_filenames, seq_dets_3D = _load_3d(args.video_id, args.data_dir, args.image_dir)
     last_dets_3D_camera = None
     last_dets_3Dto2D_image = None
+    trackers = []
     for frame, _ in enumerate(image_filenames):
         dets_3D_camera = seq_dets_3D[seq_dets_3D[:, 0] == frame, 7:14]  # 3D bounding box(h,w,l,x,y,z,theta)
         # ori_array = seq_dets_3D[seq_dets_3D[:, 0] == frame, -1].reshape((-1, 1))
@@ -64,8 +65,6 @@ def main(args):
 
         ious = box_iou(last_dets_3Dto2D_image, dets_3Dto2D_image)
         ious_map = ious > args.iou_thresh
-
-
 
         last_dets_3D_camera = dets_3D_camera
         last_dets_3Dto2D_image = dets_3Dto2D_image

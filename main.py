@@ -57,7 +57,10 @@ class DeepFusion(object):
             dets_3d_only = dets_3d_only[:, self.reorder]
 
         detection_3D_fusion = [Detection_3D_Fusion(det_fusion, dets_3d_fusion_info[i]) for i, det_fusion in enumerate(dets_3d_fusion)]
+        #print(dets_3d_fusion)
+        #[-4.57 1.84 13.53 -2.11 4.75 1/81 1.96] => 3Ddetection[[10] [11] [12] [13] [9] [8] [7]]
         detection_3D_only = [Detection_3D_only(det_only, dets_3d_only_info[i]) for i, det_only in enumerate(dets_3d_only)]
+        #print(dets_3d_only)
         detection_2D_only = [Detection_2D(det_fusion) for i, det_fusion in enumerate(detection_2D_only)]
 
         self.tracker.predict_2d()
@@ -104,10 +107,16 @@ class DeepFusion(object):
 if __name__ == '__main__':
     # Define the file name
     data_root = 'datasets/kitti/train'
-    detections_name_3D = '3D_ab3dmot_car'
-    #detections_name_3D = '3D_pointrcnn/5fps'
+
+    ### >>> EDIT HERE >>>
+    fps_3d = 5
+    #detections_name_3D = '3D_ab3dmot_car'
+    detections_name_3D = '3D_pointrcnn/5fps'
+
+    fps_2d = 10
     #detections_name_2D = '2D_rrc_Car_val'
     detections_name_2D = '2D_TrackRCNN/10fps'
+    ### <<< EDIT HERE <<<
 
     # Define the file path
     calib_root = os.path.join(data_root, 'calib_train')
@@ -131,7 +140,6 @@ if __name__ == '__main__':
     detection_file_list_3D, num_seq_3D = load_list_from_folder(detections_files_3D, detections_root_3D)
     detection_file_list_2D, num_seq_2D = load_list_from_folder(detections_files_2D, detections_root_2D)
     image_file_list, _ = load_list_from_folder(image_files, dataset_dir)
-
     total_time, total_frames, i = 0.0, 0, 0  # Tracker runtime, total frames and Serial number of the dataset
     tracker = DeepFusion(max_age=25, min_hits=3)  # Tracker initialization
 
@@ -148,16 +156,22 @@ if __name__ == '__main__':
         calib_file_seq = os.path.join(calib_root, ''.join(calib_file))
         image_dir = os.path.join(dataset_dir, image_filename)
         image_filenames = sorted([join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)])
-        seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
-        #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6
-        with open(seq_file_2D) as f:
+
+        #seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
+        seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=' ')  # load 3D detections, N x 15
+
+        #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6 ,for rrc
+        with open(seq_file_2D) as f:  # for TrackRCNN
             lines = f.readlines()
             seq_dets_2D = [[float(x) for x in line.split(" ")[:6]] for line in lines]
             seq_dets_2D = np.array(seq_dets_2D)
 
-        min_frame, max_frame = int(seq_dets_3D[:, 0].min()), len(image_filenames)
+        #min_frame, max_frame = int(seq_dets_3D[:, 0].min()), len(image_filenames)
+        min_frame, max_frame = int(seq_dets_3D[:, 0].min()), int(seq_dets_3D[:, 0].max())
 
-        for frame, img0_path in zip(range(min_frame, max_frame + 1), image_filenames):
+        step = 10 // fps_3d
+        image_filenames = image_filenames[::step]
+        for frame, img0_path in zip(range(min_frame, max_frame + 1, step), image_filenames):
             img_0 = cv2.imread(img0_path)
             _, img0_name, _ = fileparts(img0_path)
             dets_3D_camera = seq_dets_3D[seq_dets_3D[:, 0] == frame, 7:14]  # 3D bounding box(h,w,l,x,y,z,theta)
@@ -192,8 +206,9 @@ if __name__ == '__main__':
                 for d in trackers:
                     bbox3d = d.flatten()
                     #bbox3d(0 1.95 1.75 4.38 -4.65 1.85 13.6 -2.14 -1.81 2.0 295.6 166.5 452.0 291.1 9.13)
+
                     #bbox3d(flame h w l x y z rot_y alpha type 2d_x1 2d_y1 2d_x2 2d_y2 score)
- 
+
                     #import ipdb
                     #ipdb.set_trace()
 

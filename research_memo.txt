@@ -25,13 +25,28 @@ DFの結果をAB3DMOTの評価コードに落とせない
 result depends on 2D-input
 ab3dmot * trackrcnn
 pointrcnn * trackrcnn
- MOTA  0.9103
+ MOTA  0.8913
  sAMOTA  AMOTA  AMOTP 
  0.9564 0.4852 0.7902
 
 ab3dmot * rrc
 pointrcnn * rrc 
- MOTA 0.8913
+ MOTA  0.9103
  sAMOTA  AMOTA  AMOTP 
  0.9180 0.4462 0.7777
 
+5/20
+pointrcnnの検出クラスがpedestrianのみになっている
+ deepfusion ==> det_id2str = {1: 'Pedestrian', 2: 'Car', 3: 'Cyclist'}
+ pointrcnn ==> type_to_id = {'Car': 1, 'Pedestrian': 2, 'Cyclist': 3, 'Van': 4}
+ pointrcnnを変更して実行したがcudaのエラー？？
+ 
+5/31
+output
+ pointrcnn * trackrcnn      
+     fps  fps   MOTA   sAMOTA   AMOTA   AMOTP 
+      10  10   0.8913  0.9564   0.4852  0.7902
+      10   5   0.8810  0.9162   0.4576  0.7711
+       5  10   0.3968  0.4383   0.1071  0.3772
+       5   5   0.3973  0.4368   0.1066  0.3773
+     
