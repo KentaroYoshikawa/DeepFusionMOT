@@ -1,5 +1,6 @@
 import argparse
 import os
+import os.path as op
 import copy
 
 import numpy as np
@@ -16,8 +17,8 @@ from detection.detection import Detection_3D_only, Detection_2D
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--video_id", type=str, default="0000")
-parser.add_argument("--data_dir", type=str, default="./datasets/kitti/train/3D_pointrcnn/5fps/")
-parser.add_argument("--image_dir", type=str, default="./datasets/kitti/train/image_02_train/")
+parser.add_argument("--data_dir", type=str, default="./datasets/kitti/train/3D_pointrcnn/5fps")
+parser.add_argument("--image_dir", type=str, default="./datasets/kitti/train/image_02_train")
 parser.add_argument("--iou_thresh", type=float, default=0.5)
 
 
@@ -59,18 +60,24 @@ def write_to_file(filename, frame_id, cls_id, bbox2d, score, bbox3d, alpha):
     """
     lines = []
     for i in range(len(cls_id)):
-        bbox2d_i = " ".join([str(box) for box in bbox2d[i]])
-        bbox3d_i = " ".join([str(box) for box in bbox3d[i]])
-        print(f"{frame_id} {cls_id[i]} {bbox2d_i} {score[i]} {bbox3d_i} {alpha[i]}")
-        # lines.append(f"{frame_id} {cls_id[i]} {bbox2d} {score[i]} {bbox3d} {alpha[i]}\n")
-    """
+        bbox2d_i = ",".join([f"{box:.4f}" for box in bbox2d[i]])
+        bbox3d_i = ",".join([f"{box:.4f}" for box in bbox3d[i]])
+        line = f"{frame_id},{int(cls_id[i])},{bbox2d_i},{score[i]:.4f},{bbox3d_i},{alpha[i]:.4f}"
+        print(line)
+        lines.append(line+"\n")
     with open(filename, "a") as fp:
         fp.writelines(lines)
-    """
 
 def main(args):
     max_age = 25
     min_hits = 3
+    output_dir = op.join(op.dirname(args.data_dir), op.basename(args.data_dir)+"_interpolated")
+    if not op.exists(output_dir):
+        os.mkdir(output_dir)
+    output_file = op.join(output_dir, args.video_id+".txt")
+    if op.exists(output_file):
+        os.remove(output_file)
+
     image_filenames, seq_dets_3D = _load_3d(args.video_id, args.data_dir, args.image_dir)
     last_dets_3D_camera = None
     last_dets_3Dto2D_image = None
@@ -99,7 +106,7 @@ def main(args):
 
                 trk_2d.predict_2d(kf_2d)
                 bbox2d = trk_2d.x1y1x2y2()
-                write_to_file("./test.txt", frame, [cls_id], [bbox2d], [-1], [bbox3d], [alpha])
+                write_to_file(output_file, frame, [cls_id], [bbox2d], [1.0], [bbox3d], [alpha])
             continue
 
         # first iteration
@@ -135,12 +142,14 @@ def main(args):
             cls_ids = cls_id
             last_dets_3D_camera = dets_3D_camera
             last_dets_3Dto2D_image = dets_3Dto2D_image
-            write_to_file("./test.txt", frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
+            write_to_file(output_file, frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
             continue
 
         ious = box_iou(last_dets_3Dto2D_image, dets_3Dto2D_image)
         _ious = copy.deepcopy(ious)
         ious = 1.0 - ious
+        if ious.shape[1] == 0:
+            continue
         if ious.shape[0] > ious.shape[1]:
             matching = h.compute(ious.T)
             matching = [(j, i) for i, j in matching]
@@ -207,7 +216,7 @@ def main(args):
         cls_ids = new_cls_ids
         last_dets_3D_camera = dets_3D_camera
         last_dets_3Dto2D_image = dets_3Dto2D_image
-        write_to_file("./test.txt", frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
+        write_to_file(output_file, frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
 
 
 if __name__ == "__main__":
