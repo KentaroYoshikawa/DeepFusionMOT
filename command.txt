@@ -1,0 +1,15 @@
+###run
+
+python generate_imagesets.py --fps 2
+python eval_rcnn.py --cfg_file cfgs/default.yaml --ckpt PointRCNN.pth --batch_size 1 --eval_mode rcnn --start_video_id 0000 --end_video_id 0020
+
+###github
+
+git add .
+git add filename
+
+git status
+
+git commit -m ""
+
+git push
