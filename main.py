@@ -109,9 +109,9 @@ if __name__ == '__main__':
     data_root = 'datasets/kitti/train'
 
     ### >>> EDIT HERE >>>
-    fps_3d = 5
+    fps_3d = 10
     #detections_name_3D = '3D_ab3dmot_car'
-    detections_name_3D = '3D_pointrcnn/5fps'
+    detections_name_3D = '3D_pointrcnn/10fps_Car_val'
 
     fps_2d = 10
     #detections_name_2D = '2D_rrc_Car_val'
@@ -157,8 +157,10 @@ if __name__ == '__main__':
         image_dir = os.path.join(dataset_dir, image_filename)
         image_filenames = sorted([join(image_dir, x) for x in listdir(image_dir) if is_image_file(x)])
 
-        #seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
-        seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=' ')  # load 3D detections, N x 15
+        seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
+        #seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=' ')  # load 3D detections, N x 15
+
+        print(seq_dets_3D)
 
         #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6 ,for rrc
         with open(seq_file_2D) as f:  # for TrackRCNN

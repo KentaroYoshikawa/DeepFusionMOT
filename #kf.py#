@@ -194,7 +194,7 @@ def main(args):
             if i in matched_dets_indexes:
                 continue
             detection_2d = Detection_2D(det)
-            mean, covariance = kf_2d.initiate(detection_2d.to_xyah())
+https://github.com/KentaroYoshikawa/DeepFusionMOT/blob/research/kf.py            mean, covariance = kf_2d.initiate(detection_2d.to_xyah())
             new_trackers_2d.append(
                 Track_2D(
                     mean,
