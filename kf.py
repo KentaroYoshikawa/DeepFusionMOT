@@ -16,7 +16,7 @@ from detection.detection import Detection_3D_only, Detection_2D
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--video_id", type=str, default="0000")
+# parser.add_argument("--video_id", type=str, default="0000")
 parser.add_argument("--data_dir", type=str, default="./datasets/kitti/train/3D_pointrcnn/5fps")
 parser.add_argument("--image_dir", type=str, default="./datasets/kitti/train/image_02_train")
 parser.add_argument("--iou_thresh", type=float, default=0.5)
@@ -111,6 +111,7 @@ def main(args):
 
         # first iteration
         if last_dets_3D_camera is None and last_dets_3Dto2D_image is None:
+            write_to_file(output_file, frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
             for det_3D in dets_3D_camera:
                 detection_3d = Detection_3D_only(det_3D, additional_info=None)
                 kf_3d = KalmanBoxTracker(detection_3d.bbox)
@@ -125,6 +126,7 @@ def main(args):
                         additional_info=None,
                     )
                 )
+                trackers_3d[-1].update_3d(detection_3d)
                 track_id_3d += 2
             for det_2D in dets_3Dto2D_image:
                 detection_2d = Detection_2D(det_2D)
@@ -138,12 +140,14 @@ def main(args):
                         max_age,
                     )
                 )
+                trackers_2d[-1].update_2d(kf_2d, detection_2d)
                 track_id_2d += 2
             cls_ids = cls_id
             last_dets_3D_camera = dets_3D_camera
             last_dets_3Dto2D_image = dets_3Dto2D_image
-            write_to_file(output_file, frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
             continue
+
+        write_to_file(output_file, frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
 
         ious = box_iou(last_dets_3Dto2D_image, dets_3Dto2D_image)
         _ious = copy.deepcopy(ious)
@@ -162,10 +166,22 @@ def main(args):
         for matched in matching:
             last_idx, idx = matched
             matched_dets_indexes.append(idx)
+
+            # update half
             detection_3d = Detection_3D_only((dets_3D_camera[idx] + last_dets_3D_camera[last_idx]) / 2,  additional_info=None)
             detection_2d = Detection_2D((dets_3Dto2D_image[idx] + last_dets_3Dto2D_image[last_idx]) / 2)
             trackers_3d[last_idx].update_3d(detection_3d)
             trackers_2d[last_idx].update_2d(kf_2d, detection_2d)
+
+            trackers_3d[last_idx].predict_3d(trackers_3d[last_idx].kf_3d)
+            trackers_2d[last_idx].predict_2d(kf_2d)
+
+            # update
+            detection_3d = Detection_3D_only(dets_3D_camera[idx],  additional_info=None)
+            detection_2d = Detection_2D(dets_3Dto2D_image[idx])
+            trackers_3d[last_idx].update_3d(detection_3d)
+            trackers_2d[last_idx].update_2d(kf_2d, detection_2d)
+
             new_trackers_3d.append(trackers_3d[last_idx])
             new_trackers_2d.append(trackers_2d[last_idx])
             new_cls_ids.append(cls_id[idx])
@@ -216,9 +232,10 @@ def main(args):
         cls_ids = new_cls_ids
         last_dets_3D_camera = dets_3D_camera
         last_dets_3Dto2D_image = dets_3Dto2D_image
-        write_to_file(output_file, frame, cls_id, dets_3Dto2D_image, score, dets_3D_camera, alpha)
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    main(args)
+    for i in range(0, 21):
+        args.video_id = f"{i:04d}"
+        main(args)
