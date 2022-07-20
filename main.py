@@ -111,7 +111,8 @@ if __name__ == '__main__':
     ### >>> EDIT HERE >>>
     fps_3d = 10
     #detections_name_3D = '3D_ab3dmot_car'
-    detections_name_3D = '3D_pointrcnn/10fps_Car_val'
+    detections_name_3D = '3D_pointrcnn/5fps_interpolated'
+    #detections_name_3D = '3D_pointrcnn/10fps_Car_val_interpolated'
 
     fps_2d = 10
     #detections_name_2D = '2D_rrc_Car_val'
@@ -146,6 +147,8 @@ if __name__ == '__main__':
     # Iterate through each data set
     for seq_file_3D, image_filename in zip(detection_file_list_3D, image_files):
         print('--------------Start processing the {} dataset--------------'.format(image_filename))
+        #if int(image_filename) < 9:
+        #    continue
         total_image = 0  # Record the total frames in this dataset
         seq_file_2D = detection_file_list_2D[i]
         seq_name, datasets_name, _ = fileparts(seq_file_3D)
@@ -160,7 +163,7 @@ if __name__ == '__main__':
         seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=',')  # load 3D detections, N x 15
         #seq_dets_3D = np.loadtxt(seq_file_3D, delimiter=' ')  # load 3D detections, N x 15
 
-        print(seq_dets_3D)
+        #print(seq_dets_3D)
 
         #seq_dets_2D = np.loadtxt(seq_file_2D, delimiter=',')  # load 2D detections, N x 6 ,for rrc
         with open(seq_file_2D) as f:  # for TrackRCNN
@@ -193,8 +196,12 @@ if __name__ == '__main__':
             detection_2D_only_tlwh = np.array([convert_x1y1x2y2_to_tlwh(i) for i in detection_2D_only]) # (x1,y1,x2,y2) to (x,y,center_x,center_y)
 
             start_time = time.time()
-            trackers = tracker.update(detection_3D_fusion, detection_2D_only_tlwh, detection_3D_only, detection_3Dto2D_only,
+            try:
+                trackers = tracker.update(detection_3D_fusion, detection_2D_only_tlwh, detection_3D_only, detection_3Dto2D_only,
                                       additional_info, calib_file_seq)
+            except:
+                print(f"WARN: error occurred at frame {frame}")
+                continue
             cycle_time = time.time() - start_time
             total_time += cycle_time
 
